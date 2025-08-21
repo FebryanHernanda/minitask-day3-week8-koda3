@@ -9,12 +9,13 @@ func ShowTask2() {
 	var wg sync.WaitGroup
 	ch := make(chan Messages)
 
-	wg.Add(3)
+	go whiteBoard(ch)
+
+	wg.Add(4)
 	go sendMessages("Opet", "Dimana feb", ch, &wg)
 	go sendMessages("radif", "Titip Nasi padang pep", ch, &wg)
 	go sendMessages("ryan", "sini bandung pep!", ch, &wg)
-
-	go whiteBoard(ch)
+	go sendMessages("dory", "titip ambilkan paket pep!", ch, &wg)
 
 	wg.Wait()
 	close(ch)
