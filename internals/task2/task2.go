@@ -9,13 +9,19 @@ func ShowTask2() {
 	var wg sync.WaitGroup
 	ch := make(chan Messages)
 
+	allMessages := []*Messages{
+		NewMessages("Dana", "dimana bro"),
+		NewMessages("Ara", "dimana bro"),
+		NewMessages("Genji", "POSISI bro"),
+	}
+
 	go whiteBoard(ch)
 
-	wg.Add(4)
-	go sendMessages("Opet", "Dimana feb", ch, &wg)
-	go sendMessages("radif", "Titip Nasi padang pep", ch, &wg)
-	go sendMessages("ryan", "sini bandung pep!", ch, &wg)
-	go sendMessages("dory", "titip ambilkan paket pep!", ch, &wg)
+	wg.Add(len(allMessages))
+
+	for _, msg := range allMessages {
+		go sendMessages(msg, ch, &wg)
+	}
 
 	wg.Wait()
 	close(ch)
@@ -29,13 +35,21 @@ type Messages struct {
 	MsgDesc string
 }
 
-func sendMessages(sender string, message string, ch chan Messages, wg *sync.WaitGroup) {
+func NewMessages(sender, msg string) *Messages {
+	return &Messages{
+		Sender:  sender,
+		MsgDesc: msg,
+	}
+}
+
+func sendMessages(newMsg *Messages, ch chan Messages, wg *sync.WaitGroup) {
 	defer wg.Done()
-	ch <- Messages{Sender: sender, MsgDesc: message}
+	ch <- Messages{Sender: newMsg.Sender, MsgDesc: newMsg.MsgDesc}
 }
 
 func whiteBoard(msg chan Messages) {
 	for messages := range msg {
+		fmt.Println("=================New Messages=================")
 		fmt.Printf("Sender : %s\nMessage: %s\n", messages.Sender, messages.MsgDesc)
 	}
 }
